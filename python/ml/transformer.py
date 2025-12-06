@@ -19,7 +19,7 @@ class MHSA (nn.Module):
         self.scale = self.head_dim ** 0.5
         
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         b, n, d = x.shape
         assert d == self.embed_dim, f"input dim: {d} != embed_dim: {self.embed_dim}"
         qkv = self.qkv(x).reshape(b, n, 3, self.num_heads, self.head_dim).permute(2, 0, 3, 1, 4)
@@ -42,7 +42,7 @@ class MLP(nn.Module):
         self.lin2 = nn.Linear(in_features=hidden_dim, out_features=embed_dim)
         self.dropout = nn.Dropout(dropout)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.lin1(x)
         x = self.act1(x)
         x = self.lin2(x)
@@ -58,7 +58,7 @@ class TransformerBlock(nn.Module):
         self.norm2 = nn.LayerNorm(embed_dim, eps=1e-6)
         self.mlp = MLP(embed_dim, hidden_dim, dropout)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         res = x
         x = self.attn(self.norm1(x)) + res
         res = x
