@@ -2,3 +2,5 @@
 
 - python
 - verilog
+- c
+- cpp
