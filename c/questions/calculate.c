@@ -1,11 +1,11 @@
 int calculate(char* s) {
     int n = strlen(s);
     int ans = 0;
-    int ops[n/2];
+    int ops[n/2+1];
     ops[0] = 1;
     int top = 0;
     int sign = 1;
-    int nums;
+    long nums;
     char c;
     for (int p=0; p<n; ) {
         c = s[p];
