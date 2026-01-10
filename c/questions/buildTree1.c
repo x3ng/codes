@@ -24,5 +24,7 @@ struct TreeNode* buildTree(int* inorder, int inorderSize, int* postorder, int po
     for (int p=0; p<inorderSize; p++) {
         inm[inorder[p]+3000] = p;
     }
-    return build(inm, inorder, inorderSize-1, postorder, postorderSize-1, inorderSize);
+    struct TreeNode* ans = build(inm, inorder, inorderSize-1, postorder, postorderSize-1, inorderSize);
+    free(inm);
+    return ans;
 }
