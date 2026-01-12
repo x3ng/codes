@@ -4,3 +4,4 @@
 - verilog
 - c
 - cpp
+- javascript
