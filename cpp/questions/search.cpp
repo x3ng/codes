@@ -2,25 +2,31 @@ class Solution {
 public:
     int search(vector<int>& nums, int target) {
         int ns = nums.size();
-        if (ns == 1) {
-            return nums[0]==target ? 0 : -1;
+        int nev = nums[ns-1];
+        if (target == nev) {
+            return ns-1;
         }
-        int r = 0;
-        for (; r<ns-1 && nums[r]<nums[r+1]; ++r) {}      
-        int l = r + 1;
-        r += ns;
+        int l = 0;
+        int r = ns - 1;
         while (l < r) {
-            int m = ((l + r) / 2);
-            int dif = nums[m%ns] - target;
-            if (dif == 0) {
-                return m % ns;
-            } else if (dif > 0) {
-                r = m - 1;
-            } else {
-                l = m + 1;
+            int m = (l + r) / 2;
+            int mv = nums[m];
+            if (mv == target) {
+                return m;
+            } else if (target > nev) {
+                if (nums[m]<nev || nums[m]>target) {
+                    r = m - 1;
+                } else {
+                    l = m + 1;
+                }
+            } else if (target < nev) {
+                if (nums[m]>nev || nums[m]<target) {
+                    l = m + 1;
+                } else {
+                    r = m - 1;
+                }
             }
         }
-        l = l % ns;
         return nums[l]==target ? l : -1;
     }
 };
