@@ -1,12 +1,16 @@
+#include <vector>
+
+using namespace std;
+
 class Solution {
 public:
     vector<int> plusOne(vector<int>& digits) {
         for (int p=digits.size()-1; p>=0; p--) {
-            if (digits[p] < 9) {
-                digits[p]++;
-                return digits;
+            auto& d = digits[p];
+            if (++d == 10) {
+                d = 0;
             } else {
-                digits[p] = 0;
+                return digits;
             }
         }
         digits.push_back(0);
