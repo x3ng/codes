@@ -7,3 +7,4 @@
 - javascript
 - typescript
 - racket
+- haskell
