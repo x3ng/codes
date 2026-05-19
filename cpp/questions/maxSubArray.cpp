@@ -1,13 +1,20 @@
+#include <vector>
+
+using namespace std;
+
 class Solution {
 public:
     int maxSubArray(vector<int>& nums) {
-        int ns = nums.size();
-        int ans = nums[0];
-        int pm = 0;
-        for (const auto& n: nums) {
-            pm = std::max(pm+n, n);
-            ans = std::max(pm, ans);
+        int maxs = nums[0];
+        int curs = 0;
+        for (const auto n: nums) {
+            if (curs < 0) {
+                curs = n;
+            } else {
+                curs = curs + n;
+            }
+            maxs = std::max(maxs, curs);
         }
-        return ans;
+        return maxs;
     }
 };
