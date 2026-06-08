@@ -1,34 +1,38 @@
-/**
- * Definition for singly-linked list.
- * struct ListNode {
- *     int val;
- *     ListNode *next;
- *     ListNode() : val(0), next(nullptr) {}
- *     ListNode(int x) : val(x), next(nullptr) {}
- *     ListNode(int x, ListNode *next) : val(x), next(next) {}
- * };
- */
+struct ListNode {
+    int val;
+    ListNode *next;
+    ListNode() : val(0), next(nullptr) {}
+    ListNode(int x) : val(x), next(nullptr) {}
+    ListNode(int x, ListNode *next) : val(x), next(next) {}
+};
+
 class Solution {
 public:
     ListNode* reverseKGroup(ListNode* head, int k) {
-        ListNode* cur = head;
-        std::stack<ListNode*> st;
-        for (int p=k; p>0; p--) {
-            if (cur == nullptr) {
-                return head;
+        ListNode dummy(0, head);
+        ListNode* fn = &dummy;
+        ListNode* en = fn;
+        for (int i=0; i<k; ++i) {
+            fn = fn->next;
+        }
+        bool nr = fn ? true : false;
+        while (nr) {
+            ListNode* ne = en->next;
+            ListNode* nf = fn->next;
+            ListNode* cur = nullptr;
+            ListNode* nxt = en->next;
+            en->next = fn;
+            for (int i=0; i<k; ++i) {
+                ListNode* nnxt = nxt->next;
+                nxt->next = cur;
+                cur = nxt;
+                nxt = nnxt;
+                fn = fn ? fn->next : nullptr;
             }
-            st.push(cur);
-            cur = cur->next;
+            nr = fn ? true : false;
+            en = ne;
+            en->next = nf;
         }
-        ListNode* nh = st.top();
-        ListNode* nt = nh;
-        st.pop();
-        while (!st.empty()) {
-            nt->next = st.top();
-            st.pop();
-            nt = nt->next;
-        }
-        nt->next = reverseKGroup(cur, k);
-        return nh;
+        return dummy.next;
     }
 };
