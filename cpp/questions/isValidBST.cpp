@@ -1,29 +1,32 @@
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
- *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
- *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
- * };
- */
+#include <bits/stdc++.h>
+#include <functional>
+
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode() : val(0), left(nullptr), right(nullptr) {}
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+    TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+};
+
 class Solution {
-private:
-    long long pre = LLONG_MIN;
 public:
     bool isValidBST(TreeNode* root) {
-        if (root == nullptr) {
-            return true;
-        }
-        if (!isValidBST(root->left)) {
-            return false;
-        }
-        if (root->val <= pre) {
-            return false;
-        }
-        pre = root->val;
-        return isValidBST(root->right);
+        long long pre = LONG_LONG_MIN;
+        std::function<bool(TreeNode*)> io = [&](TreeNode* n) -> bool {                
+            if (n == nullptr) {
+                return true;
+            }
+            if (!io(n->left)) {
+                return false;
+            }
+            if (n->val <= pre) {
+                return false;
+            }
+            pre = n->val;
+            return io(n->right);
+        };
+        return io(root);
     }
 };
