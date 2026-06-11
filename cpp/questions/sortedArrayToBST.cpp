@@ -1,27 +1,30 @@
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
- *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
- *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
- * };
- */
+#include <functional>
+#include <vector>
+
+using namespace std;
+
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode() : val(0), left(nullptr), right(nullptr) {}
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+    TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+};
+
 class Solution {
 public:
     TreeNode* sortedArrayToBST(vector<int>& nums) {
-        auto bbst = [&](this auto&& bbst, int l, int r) -> TreeNode* {
+        std::function<TreeNode*(int, int)> bt = [&nums, &bt](int l, int r) -> TreeNode* {
             if (l > r) {
                 return nullptr;
             }
             int m = (l + r) / 2;
-            TreeNode* cn = new TreeNode(nums[m]);
-            cn->left = bbst(l, m-1);
-            cn->right = bbst(m+1, r);
-            return cn;
+            TreeNode* n = new TreeNode(nums[m]);
+            n->left = bt(l, m-1);
+            n->right = bt(m+1, r);
+            return n;
         };
-        return bbst(0, nums.size()-1);
+        return bt(0, nums.size()-1);
     }
 };
