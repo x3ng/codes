@@ -11,18 +11,19 @@ class Solution:
         if root is None:
             return []
         ans = []
-        ln = []
-        ln.append(root)
-        while len(ln):
-            cls = len(ln)
-            clv = []
-            for _ in range(cls):
-                cn = ln[0]
-                if cn.left:
-                    ln.append(cn.left)
-                if cn.right:
-                    ln.append(cn.right)
-                ln.pop(0)
-                clv.append(cn.val)
-            ans.append(clv)
+        queue = [root]        
+        while len(queue):
+            ql = len(queue)
+            cl = []
+            while ql:
+                n = queue.pop(0)
+                cl.append(n.val)
+                if n.left:
+                    queue.append(n.left)
+                if n.right:
+                    queue.append(n.right)
+                ql -= 1
+            ans.append(cl)
         return ans
+
+            

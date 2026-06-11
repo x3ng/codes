@@ -1,5 +1,8 @@
+#include <bits/stdc++.h>
 #include <vector>
-#include <queue>
+#include <deque>
+
+using namespace std;
 
 struct TreeNode {
     int val;
@@ -10,32 +13,31 @@ struct TreeNode {
     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
 
-using namespace std;
-
 class Solution {
 public:
     vector<vector<int>> levelOrder(TreeNode* root) {
-        if (!root) {
+        if (root == nullptr) {
             return {};
         }
         std::vector<std::vector<int>> ans;
-        std::queue<TreeNode*> ln;
-        ln.push(root);
-        while (!ln.empty()) {
-            std::vector<int> cln;
-            int cls = ln.size();
-            while (cls--) {
-                TreeNode* cn = ln.front();
+        std::deque<TreeNode*> dq;
+        dq.push_back(root);
+        while (!dq.empty()) {
+            int cl = dq.size();
+            std::vector<int> cv;
+            cv.reserve(cl);
+            while (cl--) {
+                TreeNode* cn = dq.front();
+                dq.pop_front();
+                cv.push_back(cn->val);
                 if (cn->left) {
-                    ln.push(cn->left);
+                    dq.push_back(cn->left);
                 }
                 if (cn->right) {
-                    ln.push(cn->right);
+                    dq.push_back(cn->right);
                 }
-                ln.pop();
-                cln.push_back(cn->val);
             }
-            ans.push_back(cln);
+            ans.emplace_back(cv);
         }
         return ans;
     }
