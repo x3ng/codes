@@ -1,32 +1,30 @@
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
- *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
- *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
- * };
- */
+#include <functional>
+
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode() : val(0), left(nullptr), right(nullptr) {}
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+    TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+};
+
 class Solution {
 public:
     int kthSmallest(TreeNode* root, int k) {
         int ans;
-        auto dfs = [&](this auto&& dfs, TreeNode* node) -> bool {
-            if (node == nullptr) {
-                return false;
+        std::function<void(TreeNode*)> io = [&](TreeNode* n) -> void {
+            if (n == nullptr) {
+                return;
             }
-            if (dfs(node->left)) {
-                return true;
-            }
+            io(n->left);
             if (--k == 0) {
-                ans = node->val;
-                return true;
+                ans = n->val;
+                return;
             }
-            return dfs(node->right);
+            io(n->right);
         };
-        dfs(root);
+        io(root);
         return ans;
     }
 };
