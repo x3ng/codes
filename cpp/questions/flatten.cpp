@@ -1,35 +1,32 @@
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
- *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
- *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
- * };
- */
+#include <functional>
+
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode() : val(0), left(nullptr), right(nullptr) {}
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+    TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+};
+
 class Solution {
 public:
     void flatten(TreeNode* root) {
-        auto pft = [](this auto&& pft, TreeNode* node) -> TreeNode* {
-            TreeNode* tail = node;
-            TreeNode* rn = node->right;
-            if (node->left) {
-                node->right = node->left;
-                tail = pft(node->left);
-                node->left = nullptr;
+        std::function<TreeNode*(TreeNode*)> io = [&](TreeNode* n) -> TreeNode* {
+            if (n == nullptr) {
+                return nullptr;
             }
-            if (rn) {
-                tail->right = rn;
-                tail = pft(rn);
+            TreeNode* rn = n->right;
+            TreeNode* le = io(n->left);
+            if (le == nullptr) {
+                le = n;
             }
-            return tail;
+            n->right = n->left;
+            n->left = nullptr;
+            TreeNode* re = io(rn);
+            le->right = rn;
+            return re ? re : le;
         };
-        if (root) {
-            pft(root);
-        } else {
-            return;
-        }
+        io(root);
     }
 };
