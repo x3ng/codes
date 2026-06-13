@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional, List
 
 class TreeNode:
     def __init__(self, val=0, left=None, right=None):
@@ -8,20 +8,13 @@ class TreeNode:
 
 class Solution:
     def rightSideView(self, root: Optional[TreeNode]) -> List[int]:
-        tmp = []
-        if root is not None:
-            tmp.append(root)
-        else:
-            return [];
         ans = []
-        while len(tmp):
-            ans.append(tmp[-1].val)
-            n = len(tmp)
-            for p in range(n):
-                cn = tmp[0]
-                tmp.pop(0)
-                if cn.left:
-                    tmp.append(cn.left)
-                if cn.right:
-                    tmp.append(cn.right)
-        return ans;
+        def io(n: Optional[TreeNode], d: int) -> None:
+            if n is None:
+                return
+            if d > len(ans):
+                ans.append(n.val)
+            io(n.right, d+1)
+            io(n.left, d+1)
+        io(root, 1)
+        return ans

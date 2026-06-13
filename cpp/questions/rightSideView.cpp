@@ -1,41 +1,31 @@
-#include <vector>
-#include <queue>
-
-struct TreeNode {
-     int val;
-     TreeNode *left;
-     TreeNode *right;
-     TreeNode() : val(0), left(nullptr), right(nullptr) {}
-     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
-     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
- };
+#include <bits/stdc++.h>
 
 using namespace std;
+
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode() : val(0), left(nullptr), right(nullptr) {}
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+    TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+};
 
 class Solution {
 public:
     vector<int> rightSideView(TreeNode* root) {
-        std::queue<TreeNode*> tmp;
-        if (root) {
-            tmp.push(root);
-        } else {
-            return {};
-        }
         std::vector<int> ans;
-        while(!tmp.empty()) {
-            int ls = tmp.size();
-            ans.push_back(tmp.back()->val);
-            while (ls--) {
-                TreeNode* cn = tmp.front();
-                tmp.pop();
-                if (cn->left) {
-                    tmp.push(cn->left);
-                }
-                if (cn->right) {
-                    tmp.push(cn->right);
-                }
+        std::function<void(TreeNode*, int)> io = [&](TreeNode* n, int d) -> void {
+            if (n == nullptr) {
+                return;
             }
-        }
+            if (d > ans.size()) {
+                ans.push_back(n->val);
+            }
+            io(n->right, d+1);
+            io(n->left, d+1);
+        };
+        io(root, 1);
         return ans;
     }
 };
