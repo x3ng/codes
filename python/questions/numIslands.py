@@ -1,21 +1,23 @@
+from typing import List
+
 class Solution:
     def numIslands(self, grid: List[List[str]]) -> int:
-        cl = len(grid)
-        rl = len(grid[0])
+        rl = len(grid)
+        cl = len(grid[0])
+        def step(r: int, c: int) -> None:
+            nonlocal rl, cl
+            if r<0 or r>=rl or c<0 or c>=cl or grid[r][c]=='0':
+                return
+            grid[r][c] = '0'
+            step(r-1, c)
+            step(r+1, c)
+            step(r, c-1)
+            step(r, c+1)
         ans = 0
-        def marklands(c: int, r: int):
-            grid[c][r] = '2'
-            if c > 0 and grid[c-1][r] == '1':
-                marklands(c-1, r)
-            if c < cl-1 and grid[c+1][r] == '1':
-                marklands(c+1, r)
-            if r > 0 and grid[c][r-1] == '1':
-                marklands(c, r-1)
-            if r < rl-1 and grid[c][r+1] == '1':
-                marklands(c, r+1)
-        for cp in range(cl):
-            for rp in range(rl):
-                if grid[cp][rp] == '1':
-                    marklands(cp, rp)
+        for i in range(rl):
+            for j in range(cl):
+                if grid[i][j] == '1':
                     ans += 1
+                    step(i, j)
         return ans
+

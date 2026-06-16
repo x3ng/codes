@@ -1,32 +1,32 @@
+#include <bits/stdc++.h>
+#include <vector>
+
+using namespace std;
+
 class Solution {
 public:
     int numIslands(vector<vector<char>>& grid) {
-        int cl = grid.size();
-        int rl = grid[0].size();
-        int ans = 0;
-        auto marklands = [&](this auto&& marklands, int c, int r) -> void {
-            grid[c][r] = '2';
-            if (c>0 && grid[c-1][r]=='1') {
-                marklands(c-1, r);
+        int rs = grid.size();
+        int cs = grid[0].size();
+        std::function<void(int, int)> step = [&](int r, int c) -> void {
+            if (r<0 || r>=rs || c<0 || c>=cs || grid[r][c] == '0') {
+                return;
             }
-            if (c<cl-1 && grid[c+1][r]=='1') {
-                marklands(c+1, r);
-            }
-            if (r>0 && grid[c][r-1]=='1') {
-                marklands(c, r-1);
-            }
-            if (r<rl-1 && grid[c][r+1]=='1') {
-                marklands(c, r+1);
-            }
+            grid[r][c] = '0';
+            step(r-1, c);
+            step(r+1, c);
+            step(r, c-1);
+            step(r, c+1);
         };
-        for (int cp=0; cp<cl; cp++) {
-            for (int rp=0; rp<rl; rp++) {
-                if (grid[cp][rp] == '1') {
-                    marklands(cp, rp);
-                    ans += 1;
+        int ans = 0;
+        for (int r=0; r<rs; ++r) {
+            for (int c=0; c<cs; ++c) {
+                if (grid[r][c] == '1') {
+                    ++ans;
+                    step(r, c);
                 }
             }
         }
-        return ans;
+        return ans; 
     }
 };
