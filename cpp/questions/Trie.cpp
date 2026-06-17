@@ -1,51 +1,59 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
 class Trie {
 private:
-    struct Node {
-        Node* child[26] = {nullptr};
-        bool is_end = false;
+    struct TNode {
+        std::vector<TNode*> child;
+        bool is_end;
+
+        TNode() {
+            child.resize(26);
+            is_end = false;
+        }
     };
-    Node* root = nullptr;
+
+    TNode* root;
+
 public:
     Trie() {
-        root = new Node(); 
+        root = new TNode();     
+    }
+
+    TNode* _toEnd(string& s) {
+        TNode* cur = root;
+        for (char c: s) {
+            TNode* nn = cur->child[c-'a'];
+            if (nn == nullptr) {
+                return nullptr;
+            }
+            cur = nn;
+        }
+        return cur;
     }
     
     void insert(string word) {
-        int ws = word.size();
-        Node* cn = root;
-        for (int p=0; p<ws; p++) {
-            int cp = word[p] - 'a';
-            if (cn->child[cp] == nullptr) {
-                cn->child[cp] = new Node();
+        TNode* cur = root;
+        for (char c: word) {
+            if (cur->child[c-'a'] == nullptr) {
+                cur->child[c-'a'] = new TNode();
             }
-            cn = cn->child[cp];
+            cur = cur->child[c-'a'];
         }
-        cn->is_end = true;
+        cur->is_end = true;
     }
     
     bool search(string word) {
-        int ws = word.size();
-        Node* cn = root;
-        for (int p=0; p<ws; p++) {
-            int cp = word[p] - 'a';
-            if (cn->child[cp] == nullptr) {
-                return false;
-            }
-            cn = cn->child[cp];
+        TNode* en = _toEnd(word);
+        if (en == nullptr) {
+            return false;
         }
-        return cn->is_end ? true : false;
+        return en->is_end;
     }
     
     bool startsWith(string prefix) {
-        int ws = prefix.size();
-        Node* cn = root;
-        for (int p=0; p<ws; p++) {
-            int cp = prefix[p] - 'a';
-            if (cn->child[cp] == nullptr) {
-                return false;
-            }
-            cn = cn->child[cp];
-        }
-        return true;
+        TNode* en = _toEnd(prefix);
+        return en ? true : false;
     }
 };
