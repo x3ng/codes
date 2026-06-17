@@ -1,35 +1,35 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
 class Solution {
 public:
     bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
-        bool valid = true;
-        std::vector<int> visited(numCourses, 0);
-        std::vector<std::vector<int>> edges(numCourses);
-        for (const auto& p: prerequisites) {
-            edges[p[0]].push_back(p[1]);
+        std::vector<std::vector<int>> graph(numCourses);
+        for (auto& v: prerequisites) {
+            graph[v[0]].push_back(v[1]);
         }
-        auto dfs = [&](this auto&& dfs, int ec) -> void {
-            visited[ec] = true;
-            for (const auto& nc: edges[ec]) {
-                if (visited[nc] == 0) {
-                    dfs(nc);
-                    if (valid == false) {
-                        return;
-                    }
-                } else if (visited[nc] == 1) {
-                    valid = false;
-                    return;
+        std::vector<int> flag(numCourses);
+        std::function<bool(int)> dfs = [&](int c) -> bool {
+            if (flag[c] == 1) {
+                return false;
+            } else if (flag[c] == 2) {
+                return true;
+            }
+            flag[c] = 1;
+            for (auto rc: graph[c]) {
+                if (!dfs(rc)) {
+                    return false;
                 }
             }
-            visited[ec] = 2;
+            flag[c] = 2;
+            return true;
         };
-        for (int c=0; c<numCourses; c++) {
-            if (visited[c] == false) {
-                dfs(c);
-            }
-            if (valid == false) {
-                break;
+        for (int i=0; i<numCourses; ++i) {
+            if (!dfs(i)) {
+                return false;
             }
         }
-        return valid;
+        return true;
     }
 };
