@@ -1,31 +1,27 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
 class Solution {
 private:
-    std::map<char, std::string> km = {
-        {'2', "abc"},
-        {'3', "def"},
-        {'4', "ghi"},
-        {'5', "jkl"},
-        {'6', "mno"},
-        {'7', "pqrs"},
-        {'8', "tuv"},
-        {'9', "wxyz"}
-    };
+    static constexpr const char* kc[8] = {"abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
 public:
     vector<string> letterCombinations(string digits) {
+        int ds = digits.size();
+        std::string tmp;
+        tmp.resize(ds);
         std::vector<std::string> ans;
-        int dl = digits.size();
-        std::string tmp = "";
-        auto bt = [&](this auto&& bt, int p, std::string& bs) -> void {
-            if (p == dl) {
-                ans.push_back(bs);
+        std::function<void(int)> bs = [&](int p) -> void {
+            if (p == ds) {
+                ans.push_back(tmp);
+                return;
             }
-            for (auto& c: km[digits[p]]) {
-                bs.push_back(c);
-                bt(p+1, bs);
-                bs.pop_back();
+            for (const auto c: std::string(kc[digits[p]-'2'])) {
+                tmp[p] = c;
+                bs(p+1);
             }
         };
-        bt(0, tmp);
+        bs(0);
         return ans;
     }
 };
