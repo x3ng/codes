@@ -4,6 +4,7 @@
 - verilog
 - c
 - cpp
+- rust
 - cuda
 - javascript
 - typescript
