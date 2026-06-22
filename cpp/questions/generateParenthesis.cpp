@@ -1,21 +1,28 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
 class Solution {
 public:
     vector<string> generateParenthesis(int n) {
-        std::vector<std::string> ans;
-        std::string tmp = "";
-        auto bt = [&](this auto&& bt, int lc, int rc) -> void {
-            if (lc==n && rc==n) {
+        std::vector<std::string> ans;        
+        std::string tmp(n*2, '0');
+        std::function<void(int, int)> bs = [&](int p, int l) -> void {
+            if (l == n) {
+                while (p < n*2) {
+                    tmp[p++] = ')';
+                }
                 ans.emplace_back(tmp);
-            } else if (lc<=n && rc<=lc) {
-                tmp += '(';
-                bt(lc+1, rc);
-                tmp.pop_back();
-                tmp += ')';
-                bt(lc, rc+1);
-                tmp.pop_back();
+                return;
             }
+            if (p < l*2) {
+                tmp[p] = ')';
+                bs(p+1, l);
+            }
+            tmp[p] = '(';
+            bs(p+1, l+1);
         };
-        bt(0, 0);
+        bs(0, 0);
         return ans;
     }
 };
