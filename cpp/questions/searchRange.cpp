@@ -1,30 +1,39 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
 class Solution {
 public:
     vector<int> searchRange(vector<int>& nums, int target) {
+        std::vector<int> ans(2, -1);
         int ns = nums.size();
         if (ns == 0) {
-            return {-1, -1};
+            return ans;
         }
         int l = 0;
-        int r = ns - 1;
-        int m = (l + r) / 2;
+        int r = ns;
         while (l < r) {
-            int diff = nums[m] - target;
-            if (diff == 0) {
-                break;
-            } else if (diff > 0) {
-                r = m - 1;
+            int m = (l + r) / 2;
+            if (nums[m] >= target) {
+                r = m;
             } else {
                 l = m + 1;
             }
-            m = (l + r) / 2;
         }
-        if (nums[m] != target) {
-            return {-1, -1};
-        } else {
-            for (l=m; l>=0 && nums[l]==target; --l) {}
-            for (r=m; r<ns && nums[r]==target; ++r) {}
-            return {l+1, r-1};
+        if (l>=ns || nums[l]!= target) {
+            return ans;
         }
+        ans[0] = l;
+        r = ns - 1;
+        while (l < r) {
+            int m = (l + r + 1) / 2;
+            if (nums[m] <= target) {
+                l = m;
+            } else {
+                r = m - 1;
+            }
+        }
+        ans[1] = r;
+        return ans;
     }
 };
