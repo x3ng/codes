@@ -1,18 +1,27 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
 class Solution {
 public:
     int findMin(vector<int>& nums) {
-        int nfp = nums.size() - 1;
         int l = 0;
-        int r = nfp;
+        int r = nums.size() - 1;
+        if (nums[l] < nums[r]) {
+            return nums[0];
+        }
         while (l < r) {
             int m = (l + r) / 2;
-            int diff = nums[m] - nums[nfp];
-            if (diff > 0) {
-                l = m + 1;
+            if (nums[m] >= nums[l]) {
+                if (nums[l] > nums[r]) {
+                    l = m + 1;
+                } else {
+                    return nums[l];
+                }
             } else {
-                r = m - 1;
+                r = m;
             }
         }
-        return nums[l] > nums[nfp] ? nums[l+1] : nums[l];
+        return nums[l];
     }
 };
