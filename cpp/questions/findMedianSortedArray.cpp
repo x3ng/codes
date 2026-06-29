@@ -1,40 +1,45 @@
-#include <vector>
-#include <climits>
+#include <bits/stdc++.h>
 
 using namespace std;
 
 class Solution {
 public:
     double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
-        int ns1 = nums1.size();
-        int ns2 = nums2.size();
-        if (ns1 > ns2) {
-            std::swap(nums1, nums2);
-            std::swap(ns1, ns2);
-        }
-        int tn = ns1 + ns2;
-        int ts = tn / 2;
-        int l = 0;
-        int r = ns1;
-        while (l <= r) {
-            int m = (l + r) / 2;
-            int tm = ts - m;
-            int nums1l = m > 0 ? nums1[m-1] : INT_MIN;
-            int nums1h = m < ns1 ? nums1[m] : INT_MAX;
-            int nums2l = tm > 0 ? nums2[tm-1] : INT_MIN;
-            int nums2h = tm < ns2 ? nums2[tm] : INT_MAX;
-            if (nums1l <= nums2h && nums2l <= nums1h) {
-                if (tn % 2) {
-                    return std::min(nums1h, nums2h);
-                } else {
-                    return (std::max(nums1l, nums2l) + std::min(nums1h, nums2h)) / 2.0;
-                }
-            } else if (nums1h < nums2l) {
-                l = m + 1;
-            } else {
-                r = m - 1;
+        int p1 = 0;
+        int p2 = 0;
+        int s1 = nums1.size();
+        int s2 = nums2.size();
+        int fs = s1 + s2;
+        int hs = (s1 + s2 + 1) / 2;
+        int sn = hs + 1;
+        while (sn > 1) {
+            if (p1 == s1) {
+                p2 = hs - s1;
+                break;
+            } else if (p2 == s2) {
+                p1 = hs - s2;
+                break;
             }
+            int cp = sn >> 1;
+            int n1 = p1 + cp;
+            int n2 = p2 + cp;
+            n1 = min(n1, s1);
+            n2 = min(n2, s2);
+            if (nums1[n1-1] > nums2[n2-1]) {
+                p2 = n2;
+            } else {
+                p1 = n1;
+            }
+            sn -= cp;
         }
-        return 0;
+        int l1 = p1>0 ? nums1[p1-1] : INT_MIN;
+        int l2 = p2>0 ? nums2[p2-1] : INT_MIN;
+        int r1 = p1<s1 ? nums1[p1] : INT_MAX;
+        int r2 = p2<s2 ? nums2[p2] : INT_MAX;
+        if (fs % 2) {
+            return max(l1, l2);
+        } else {
+            return (max(l1, l2) + min(r1, r2)) / 2.0;
+        }
     }
 };

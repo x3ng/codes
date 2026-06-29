@@ -1,27 +1,37 @@
+from typing import List
+
 class Solution:
     def findMedianSortedArrays(self, nums1: List[int], nums2: List[int]) -> float:
-        if len(nums1) > len(nums2):
-            nums1, nums2 = nums2, nums1
-        ns1 = len(nums1)
-        ns2 = len(nums2)
-        a = ns1 + ns2
-        t = a // 2
-        l = 0
-        r = ns1
-        while l <= r:
-            m = (l + r) // 2
-            tm = t - m
-            n1l = nums1[m-1] if m > 0 else -inf
-            n1h = nums1[m] if m < ns1 else inf
-            n2l = nums2[tm-1] if tm > 0 else -inf
-            n2h = nums2[tm] if tm < ns2 else inf
-            if n1l <= n2h and n2l <= n1h:
-                if a % 2:
-                    return min(n1h, n2h)
-                else:
-                    return (max(n1l, n2l) + min(n1h, n2h)) / 2
-            elif n1l > n2h:
-                r = m - 1
+        p1 = 0
+        p2 = 0
+        r1 = len(nums1)
+        r2 = len(nums2)
+        ls = r1 + r2
+        hl = (ls + 1) // 2
+        ds = hl + 1
+        while ds>1:
+            if p1 == r1:
+                p2 = hl - r1
+                break
+            elif p2 == r2:
+                p1 = hl - r2
+                break
+            np = ds // 2
+            n1 = p1 + np
+            n2 = p2 + np
+            n1 = min(n1, r1)
+            n2 = min(n2, r2)
+            if nums1[n1-1] > nums2[n2-1]:
+                p2 = n2
+                ds -= np
             else:
-                l = m + 1
-        return 0
+                p1 = n1
+                ds -= np
+        nv1 = nums1[p1] if p1<r1 else float("inf")
+        nv2 = nums2[p2] if p2<r2 else float("inf")
+        pv1 = nums1[p1-1] if p1>0 else -float("inf")
+        pv2 = nums2[p2-1] if p2>0 else -float("inf")
+        if ls % 2:
+            return max(pv1, pv2)
+        else:
+            return (max(pv1, pv2) + min(nv1, nv2)) / 2
