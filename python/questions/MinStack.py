@@ -1,16 +1,23 @@
+from typing import List
+
 class MinStack:
 
     def __init__(self):
-        self.st = [(0, inf)]
+        self.st: List[tuple[int, int]] = []
 
-    def push(self, val: int) -> None:
-        self.st.append((val, min(val, self.st[-1][1])))
+    def push(self, value: int) -> None:
+        if not self.st:
+            mv = value
+        else:
+            mv = min(self.st[-1][1], value)
+        self.st.append((value, mv))
 
     def pop(self) -> None:
-        self.st.pop()
+        self.st.pop()        
 
     def top(self) -> int:
-        return self.st[-1][0]
+        return self.st[-1][0] 
 
     def getMin(self) -> int:
-        return self.st[-1][1]
+        return self.st[-1][1] 
+

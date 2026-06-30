@@ -1,23 +1,30 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
 class MinStack {
-    std::stack<std::pair<int, int>> st;
+private:
+    std::stack<std::pair<int ,int>> st;
 public:
-    MinStack() {
-        st.emplace(0, INT_MAX);
-    }
+    MinStack() {}
     
-    void push(int val) {
-        st.emplace(val, std::min(val, getMin()));
+    void push(int value) {
+        int cm = value;
+        if (!st.empty()) {
+            cm = std::min(cm, st.top().second);
+        }
+        st.emplace(value, cm);
     }
     
     void pop() {
-        st.pop();
+        st.pop(); 
     }
     
     int top() {
-        return st.top().first;
+        return st.top().first; 
     }
     
     int getMin() {
-        return st.top().second;
+        return st.top().second; 
     }
 };
