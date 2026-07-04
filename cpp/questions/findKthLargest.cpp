@@ -1,19 +1,17 @@
-#include <vector>
-#include <queue>
+#include <bits/stdc++.h>
 
 using namespace std;
 
 class Solution {
 public:
     int findKthLargest(vector<int>& nums, int k) {
-        std::priority_queue<int, std::vector<int>, std::greater<>> pq;
-        for (int p=0; p<nums.size(); ++p) {
-            int cn = nums[p];
+        std::priority_queue<int, std::vector<int>, std::greater<>> pq;        
+        for (const auto n: nums) {
             if (pq.size() < k) {
-                pq.push(cn);
-            } else if (cn > pq.top()) {
+                pq.push(n);
+            } else if (n > pq.top()) {
                 pq.pop();
-                pq.push(cn);
+                pq.push(n);
             }
         }
         return pq.top();
