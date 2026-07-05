@@ -1,39 +1,39 @@
-#include <queue>
+#include <bits/stdc++.h>
+
+using namespace std;
 
 class MedianFinder {
 private:
-    std::priority_queue<int, std::vector<int>, std::less<>> shq;
-    std::priority_queue<int, std::vector<int>, std::greater<>> bhq;
+    std::priority_queue<int, std::vector<int>, std::greater<>> gq;
+    std::priority_queue<int, std::vector<int>, std::less<>> lq;
+
 public:
-    MedianFinder() {
-    }
+    MedianFinder() {}
     
     void addNum(int num) {
-        shq.push(num);
-        while (shq.size()-bhq.size() > 1) {
-            bhq.push(shq.top());
-            shq.pop();
+        if (lq.size() <= gq.size()) {
+            lq.push(num);
+        } else {
+            gq.push(num);
         }
-        while (!bhq.empty() && shq.top()>bhq.top()) {
-            bhq.push(shq.top());
-            shq.push(bhq.top());
-            bhq.pop();
-            shq.pop();
+        if (lq.empty() || gq.empty()) {
+            return;
+        }
+        while (lq.top() > gq.top()) {
+            int lt = lq.top();
+            int gt = gq.top();
+            lq.pop();
+            gq.pop();
+            lq.push(gt);
+            gq.push(lt);
         }
     }
     
     double findMedian() {
-        if (shq.size() == bhq.size()) {
-            return (shq.top() + bhq.top()) / 2.0;
+        if (lq.size() == gq.size()) {
+            return (lq.top()+gq.top()) / 2.0;
         } else {
-            return shq.top();
+            return static_cast<double>(lq.top());
         }
     }
 };
-
-/**
- * Your MedianFinder object will be instantiated and called as such:
- * MedianFinder* obj = new MedianFinder();
- * obj->addNum(num);
- * double param_2 = obj->findMedian();
- */
