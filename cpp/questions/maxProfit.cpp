@@ -1,20 +1,16 @@
-#include <vector>
-#include <climits>
+#include <bits/stdc++.h>
 
 using namespace std;
 
 class Solution {
 public:
     int maxProfit(vector<int>& prices) {
-        int k = 2;
-        std::vector<int> buy(k+1, INT_MIN);
-        std::vector<int> sel(k+1, 0);
-        for (const int& price: prices) {
-            for (int p=1; p<=k; ++p) {
-                buy[p] = std::max(buy[p], sel[p-1]-price);
-                sel[p] = std::max(sel[p], buy[p]+price);
-            }
+        int pm = prices[0];
+        int ans = 0;
+        for (const auto& p: prices) {
+            ans = std::max(ans, p-pm);
+            pm = std::min(pm, p);
         }
-        return sel[k];
+        return ans;
     }
 };
