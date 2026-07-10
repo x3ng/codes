@@ -1,17 +1,22 @@
-#include <array>
+#include <bits/stdc++.h>
+
+using namespace std;
 
 class Solution {
+private:
+    std::vector<int> cc;
 public:
     int climbStairs(int n) {
-        if (n <= 1) {
-            return 0;
+        if (cc.size() < n+1) {
+            cc.resize(n+1, -1);
         }
-        std::array<int ,2> dp = {0, 1};
-        while (n--) {
-            int tmp = dp[1];
-            dp[1] += dp[0];
-            dp[0] = tmp;
+        if (cc[n] == -1) {
+            if (n <= 1) {
+                cc[n] = 1;
+            } else {
+                cc[n] = climbStairs(n-1) + climbStairs(n-2);
+            }
         }
-        return dp[1];
+        return cc[n];
     }
 };
