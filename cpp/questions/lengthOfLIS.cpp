@@ -1,5 +1,4 @@
-#include <vector>
-#include <climits>
+#include <bits/stdc++.h>
 
 using namespace std;
 
@@ -7,17 +6,22 @@ class Solution {
 public:
     int lengthOfLIS(vector<int>& nums) {
         int ns = nums.size();
-        int ans = 1;
-        std::vector<int> dp(ns, 1);
-        for (int r=1; r<ns; ++r) {
-            int rv = nums[r];
-            for (int l=r-1; l>=0; --l) {
-                if (nums[l] < rv) {
-                    dp[r] = std::max(dp[l]+1, dp[r]);
+        int ans = 0;
+        std::vector<int> ep(ns, 0);
+        for (const auto n: nums) {
+            int l = 0;
+            int r = ans;
+            while (l < r) {
+                int m = (l + r) / 2;
+                if (ep[m] >= n) {
+                    r = m;
+                } else {
+                    l = m + 1;
                 }
             }
-            ans = std::max(ans, dp[r]);
+            ep[l] = n;
+            ans = std::max(ans, l+1);
         }
-        return ans;
+        return ans;        
     }
 };
