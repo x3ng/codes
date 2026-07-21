@@ -1,5 +1,4 @@
-#include <string>
-#include <functional>
+#include <bits/stdc++.h>
 
 using namespace std;
 
@@ -24,7 +23,7 @@ public:
                 pc = dfs(p1-1, p2-1);
                 return pc;
             }
-            pc = std::min({dfs(p1-1, p2), dfs(p1, p2-1), dfs(p1-1, p2-1)})+1;
+            pc = std::min({dfs(p1-1, p2), dfs(p1, p2-1), dfs(p1-1, p2-1)}) + 1;
             return pc;
         };
         return dfs(ws1-1, ws2-1);
