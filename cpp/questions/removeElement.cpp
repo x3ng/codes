@@ -1,23 +1,16 @@
-#include <vector>
+#include <bits/stdc++.h>
 
 using namespace std;
 
 class Solution {
 public:
     int removeElement(vector<int>& nums, int val) {
-        int r = nums.size() - 1;
-        if (r < 0) {
-            return 0;
-        }
-        int l = 0;
-        for (; l<r; ++l) {
-            if (nums[l] == val) {
-                while (r>l && nums[r]==val) {
-                    --r;
-                }
-                std::swap(nums[l], nums[r]);
+        int r = 0;
+        for (int p=0; p<nums.size(); ++p) {
+            if (nums[p] != val) {
+                nums[r++] = nums[p];
             }
         }
-        return nums[r]==val ? r : r+1;
+        return r;
     }
 };
