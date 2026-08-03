@@ -5,12 +5,12 @@ using namespace std;
 class Solution {
 public:
     int maxProfit(vector<int>& prices) {
-        int pm = prices[0];
-        int ans = 0;
+        int mv = prices[0];
+        int mp = 0;
         for (const auto& p: prices) {
-            ans = std::max(ans, p-pm);
-            pm = std::min(pm, p);
+            mv = min(mv, p);
+            mp = max(mp, p-mv);
         }
-        return ans;
+        return mp;
     }
 };
