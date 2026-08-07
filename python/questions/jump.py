@@ -1,16 +1,18 @@
 from typing import List
 
+
 class Solution:
     def jump(self, nums: List[int]) -> int:
         ln = len(nums)
-        ans = 0
-        sp = 0
-        ep = 0
-        while ep < ln-1:
-            ce = sp
-            for i in range(sp, ep+1):
-                ce = max(ce, i+nums[i])
-            sp = ep + 1
-            ep = ce
-            ans += 1
-        return ans
+        l = 0
+        r = 0
+        s = 0
+        while l <= r:
+            if r >= ln - 1:
+                return s
+            cr = r
+            for p in range(l, cr + 1):
+                r = max(r, nums[p] + p)
+            l = cr + 1
+            s += 1
+        return -1

@@ -6,18 +6,19 @@ class Solution {
 public:
     int jump(vector<int>& nums) {
         int ns = nums.size();
-        int ans = 0;
-        int sp = 0;
-        int ep = 0;
-        while (ep < ns-1) {
-            int ne = sp;
-            for (int i=sp; i<ep+1; ++i) {
-                ne = std::max(ne, i+nums[i]);
+        int r = 0;
+        int l = 0;
+        int s = 0;
+        while (l <= r) {
+            if (r >= ns-1) {
+                return s;
             }
-            sp = ep + 1;
-            ep = ne;
-            ++ans;
+            int cr = r;
+            for (; l<=cr; ++l) {
+                r = std::max(r, nums[l]+l);
+            }
+            ++s;
         }
-        return ans;
+        return -1;
     }
 };
