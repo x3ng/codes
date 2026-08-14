@@ -1,22 +1,15 @@
-#include<vector>
+#include <bits/stdc++.h>
 
 using namespace std;
 
 class Solution {
 public:
     void moveZeroes(vector<int>& nums) {
-        int n = nums.size();
-        if (n <= 1) {
-            return;
-        }
-        int nz = 0;
-        for (int i=0; i<n; ++i) {
-            if (nums[i] != 0) {
-                nums[nz++] = nums[i];
+        int zp = 0;
+        for (int i=0; i<nums.size(); ++i) {
+            if (nums[i]) {
+                std::swap(nums[i], nums[zp++]);
             }
-        }
-        for (; nz<n; ++nz) {
-            nums[nz] = 0;
         }
     }
 };
