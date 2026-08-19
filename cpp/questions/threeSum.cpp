@@ -1,5 +1,4 @@
-#include <algorithm>
-#include <vector>
+#include <bits/stdc++.h>
 
 using namespace std;
 
@@ -27,14 +26,12 @@ public:
                     ++l;
                 } else {
                     ans.push_back({t, nums[l], nums[r]});
-                    ++l;
-                    while (l<r && nums[l-1]==nums[l]) {
+                    do {
                         ++l;
-                    }
-                    --r;
-                    while (l<r && nums[r]==nums[r+1]) {
+                    } while (l<r && nums[l-1]==nums[l]);
+                    do {
                         --r;
-                    }
+                    } while (l<r && nums[r]==nums[r+1]);
                 }
             }
         }
