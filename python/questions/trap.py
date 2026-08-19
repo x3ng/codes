@@ -1,5 +1,6 @@
 from typing import List
 
+
 class Solution:
     def trap(self, height: List[int]) -> int:
         l = 0
@@ -16,4 +17,4 @@ class Solution:
                 ans += sufm - height[r]
                 r -= 1
                 sufm = max(sufm, height[r])
-        return ans;
+        return ans
