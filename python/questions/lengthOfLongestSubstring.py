@@ -6,11 +6,11 @@ class Solution:
         ext = set()
         while r < len(s):
             if s[r] in ext:
-                ans = max(ans, r-l)
+                ans = max(ans, r - l)
                 while s[r] in ext:
                     ext.remove(s[l])
                     l += 1
             ext.add(s[r])
             r += 1
-        ans = max(ans, r-l)
+        ans = max(ans, r - l)
         return ans
