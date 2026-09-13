@@ -1,4 +1,4 @@
-function rt(nums: number[], l: number, r: number): void {
+function reverse(nums: number[], l: number, r: number): void {
   while (l < r) {
     [nums[l], nums[r]] = [nums[r], nums[l]];
     ++l;
@@ -7,9 +7,9 @@ function rt(nums: number[], l: number, r: number): void {
 }
 
 function rotate(nums: number[], k: number): void {
-  let ns = nums.length;
+  const ns = nums.length;
   k %= ns;
-  rt(nums, 0, ns - 1);
-  rt(nums, 0, k - 1);
-  rt(nums, k, ns - 1);
+  reverse(nums, 0, ns - 1);
+  reverse(nums, 0, k - 1);
+  reverse(nums, k, ns - 1);
 }
