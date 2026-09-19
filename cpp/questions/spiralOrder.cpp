@@ -1,4 +1,4 @@
-#include <vector>
+#include <bits/stdc++.h>
 
 using namespace std;
 
@@ -7,41 +7,22 @@ private:
     static constexpr int DIR[4][2] = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
 public:
     vector<int> spiralOrder(vector<vector<int>>& matrix) {
-        int rs = matrix.size();
         int cs = matrix[0].size();
-        std::vector<int> ans(rs*cs);
-        int l = 0;
-        int ac = 0;
+        int ns = matrix.size() - 1;
+        std::vector<int> ans(matrix.size() * matrix[0].size());
         int d = 0;
         int r = 0;
-        int c = 0;
-        while (ac < rs*cs) {
-            ans[ac++] = matrix[r][c];
-            switch (d) {
-                case 0:
-                    if (c == cs-l-1) {
-                        d = 1;
-                    }
-                    break;
-                case 1:
-                    if (r == rs-l-1) {
-                        d = 2;
-                    }
-                    break;
-                case 2:
-                    if (c == l) {
-                        d = 3;
-                    }
-                    break;
-                case 3:
-                    if (r == l+1) {
-                        d = 0;
-                        l += 1;
-                    }
-                    break;
+        int c = -1;
+        int p = 0;
+        while (cs) {
+            for (int i= 0; i<cs; ++i) {
+                r += DIR[d][0];
+                c += DIR[d][1];
+                ans[p++] = matrix[r][c];
             }
-            r += DIR[d][0];
-            c += DIR[d][1];
+            std::swap(cs, ns);
+            --ns;
+            d = (d + 1) % 4;
         }
         return ans;
     }
