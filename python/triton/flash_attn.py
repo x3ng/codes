@@ -1,3 +1,5 @@
+import math
+
 import torch
 import triton
 import triton.language as tl
@@ -17,7 +19,6 @@ def attention(q: torch.Tensor, k: torch.Tensor, v: torch.Tensor):
     return torch.softmax(q @ k.transpose(-1, -2) * scale, dim=-1) @ v
 
 
-
 def attention_tile_sizes(q: torch.Tensor):
     """Choose tiles using the paper's simplified SRAM budget (SMEM in bytes).
 
@@ -33,6 +34,7 @@ def attention_tile_sizes(q: torch.Tensor):
         raise ValueError("SMEM budget is too small for one attention tile")
     br = min(bc, head_dim)
     return br, bc
+
 
 def flash_attn_v1(q: torch.Tensor, k: torch.Tensor, v: torch.Tensor):
     q_len, head_dim = q.shape
@@ -116,7 +118,7 @@ def flash_attn_v2(q: torch.Tensor, k: torch.Tensor, v: torch.Tensor):
 
 
 @triton.jit
-def fa_v2_kernel(
+def fa_v2_kernel_s(
     q,
     k,
     v,
@@ -180,13 +182,125 @@ def fa_v2_kernel(
     )
 
 
+@triton.jit
+def fa_v2_kernel(
+    q,
+    k,
+    v,
+    o,
+    m,
+    l,
+    stride_qb,
+    stride_qh,
+    stride_qn,
+    stride_qd,
+    stride_kb,
+    stride_kh,
+    stride_kn,
+    stride_kd,
+    stride_vb,
+    stride_vh,
+    stride_vn,
+    stride_vd,
+    stride_ob,
+    stride_oh,
+    stride_on,
+    stride_od,
+    stride_mlb,
+    stride_mlh,
+    stride_mln,
+    qn,
+    kvn,
+    D: tl.constexpr,
+    BR: tl.constexpr,
+    BC: tl.constexpr,
+    BD: tl.constexpr,
+    CAUSAL: tl.constexpr,
+):
+    bid = tl.program_id(0)
+    hid = tl.program_id(1)
+
+    q_off = stride_qb * bid + stride_qh * hid
+    k_off = stride_kb * bid + stride_kh * hid
+    v_off = stride_vb * bid + stride_vh * hid
+    o_off = stride_ob * bid + stride_oh * hid
+    ml_off = stride_mlb * bid + stride_mlh * hid
+
+    scale = 1.0 / math.sqrt(D)
+    d_range = tl.arange(0, BD)
+    d_mask = d_range < D
+
+    for rs in range(0, qn, BR):
+        r_range = rs + tl.arange(0, BR)
+        r_mask = r_range < qn
+        rq = tl.load(
+            q + q_off + r_range[:, None] * stride_qn + d_range[None, :] * stride_qd,
+            mask=(r_mask[:, None] & d_mask[None, :]),
+            other=0.0,
+        )
+        ro = tl.load(
+            o + o_off + r_range[:, None] * stride_on + d_range[None, :] * stride_od,
+            mask=(r_mask[:, None] & d_mask[None, :]),
+            other=0.0,
+        )
+        rm = tl.load(
+            m + ml_off + r_range * stride_mln,
+            mask=r_range < qn,
+            other=-float("inf"),
+        )
+        rl = tl.load(
+            l + ml_off + r_range * stride_mln,
+            mask=r_range < qn,
+            other=0.0,
+        )
+        for cs in range(0, kvn, BC):
+            c_range = cs + tl.arange(0, BC)
+            c_mask = c_range < kvn
+            ck = tl.load(
+                k + k_off + c_range[:, None] * stride_kn + d_range[None, :] * stride_kd,
+                mask=(c_mask[:, None] & d_mask[None, :]),
+                other=0.0,
+            )
+            cv = tl.load(
+                v + v_off + c_range[:, None] * stride_vn + d_range[None, :] * stride_vd,
+                mask=(c_mask[:, None] & d_mask[None, :]),
+                other=0.0,
+            )
+
+            s = tl.dot(rq, tl.trans(ck)) * scale
+            valid = c_range[None, :] < kvn
+            if CAUSAL:
+                valid = valid & (r_range[:, None] >= c_range[None, :])
+            s = tl.where(valid, s, -float("inf"))
+            nm = tl.maximum(rm, tl.max(s, dim=-1))
+            ms = tl.exp(rm - nm)
+            rm = nm
+
+            p = tl.exp(s - nm[:, None])
+            rl = rl * ms + tl.sum(p, dim=-1)
+
+            ro = ro * ms[:, None] + tl.dot(p, cv)
+
+        ro = ro / rl[:, None]
+
+        tl.store(
+            o + o_off + r_range[:, None] * stride_on + d_range[None, :] * stride_od,
+            ro,
+            mask=(r_mask[:, None] & d_mask[None, :]),
+        )
+        tl.store(m + ml_off + r_range * stride_mln, rm, mask=r_range < qn)
+        tl.store(l + ml_off + r_range * stride_mln, rl, mask=r_range < qn)
+
+
 def fa_v2_tl(q: torch.Tensor, k: torch.Tensor, v: torch.Tensor, causal: bool = False):
     if any(t.ndim != 2 for t in (q, k, v)):
         raise ValueError("Expected 2D Q, K, V tensors")
     q_len, head_dim = q.shape
     kv_len = k.shape[0]
     if k.shape != v.shape or k.shape[1] != head_dim:
-        raise ValueError("Q, K, V must share a head dimension; K and V must share a shape")
+        raise ValueError(
+            "Q, K, V must share a head dimension; K and V must share a shape"
+        )
     if head_dim == 0 or kv_len == 0:
         raise ValueError("Head dimension and KV length must be positive")
     interpret = triton.knobs.runtime.interpret
@@ -214,7 +328,7 @@ def fa_v2_tl(q: torch.Tensor, k: torch.Tensor, v: torch.Tensor, causal: bool = F
         k,
         v,
         o,
-        head_dim ** -0.5,
+        head_dim**-0.5,
         Nq=q_len,
         Nkv=kv_len,
         D=head_dim,
@@ -253,13 +367,19 @@ if __name__ == "__main__":
     test_result = run_test(methods, q, k, v)
     if triton.knobs.runtime.interpret or torch.cuda.is_available():
         device = "cpu" if triton.knobs.runtime.interpret else "cuda"
-        q_gpu, k_gpu, v_gpu = (t.to(device=device, dtype=torch.float16) for t in (q, k, v))
+        q_gpu, k_gpu, v_gpu = (
+            t.to(device=device, dtype=torch.float16) for t in (q, k, v)
+        )
         for causal in (False, True):
-            scores = q_gpu.float() @ k_gpu.float().T * head_dim ** -0.5
+            scores = q_gpu.float() @ k_gpu.float().T * head_dim**-0.5
             if causal:
                 mask = torch.arange(seq_len, device=q_gpu.device)
-                scores = scores.masked_fill(mask[:, None] < mask[None, :], -float("inf"))
+                scores = scores.masked_fill(
+                    mask[:, None] < mask[None, :], -float("inf")
+                )
             ref = torch.softmax(scores, dim=-1) @ v_gpu.float()
             out = fa_v2_tl(q_gpu, k_gpu, v_gpu, causal=causal)
             torch.testing.assert_close(out.float(), ref, atol=2e-3, rtol=2e-3)
-            print(f"fa_v2_tl causal={causal} | max_diff = {(out.float() - ref).abs().max().item():.3e}")
+            print(
+                f"fa_v2_tl causal={causal} | max_diff = {(out.float() - ref).abs().max().item():.3e}"
+            )
