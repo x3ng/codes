@@ -9,26 +9,33 @@ struct ListNode {
 };
 
 class Solution {
+private:
+    void reverse(ListNode* b, ListNode* e) {
+        ListNode* p = nullptr;
+        while (p != e) {
+            ListNode* n = b->next;
+            b->next = p;
+            p = b;
+            b = n;
+        }
+    }
 public:
     bool isPalindrome(ListNode* head) {
-        int ll = 0;
-        ListNode* cn = head;
-        while (cn) {
-            cn = cn->next;
-            ++ll;
+        ListNode* s = head;
+        ListNode* f = head->next;
+        while (f && f->next) {
+            s = s->next;
+            f = f->next->next;
         }
-        int hl = ll / 2;
-        std::vector<int> pl(hl);
-        while (hl--) {
-            pl[hl] = head->val;
-            head = head->next;
-        }
-        head = ll%2 ? head->next : head;
-        for (int i=0; i<pl.size(); ++i) {
-            if (head->val != pl[i]) {
+        ListNode* ns = s->next;
+        reverse(head, s);
+        ListNode* ps = f ? s : s->next;
+        while (ps && ns) {
+            if (ps->val != ns->val) {
                 return false;
             }
-            head = head->next;
+            ps = ps->next;
+            ns = ns->next;
         }
         return true;
     }
